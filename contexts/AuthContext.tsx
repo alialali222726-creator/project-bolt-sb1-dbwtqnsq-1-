@@ -5,8 +5,11 @@ import { supabase } from '@/lib/supabase';
 interface Profile {
   id: string;
   full_name: string;
-  role: 'doctor' | 'primary_caregiver' | 'backup_caregiver' | 'patient';
+  phone_number?: string;
+  role: 'doctor' | 'primary_caregiver' | 'backup_caregiver' | 'patient' | 'cupper' | 'patient_getting_cupping';
   language_preference: 'ar' | 'en';
+  date_of_birth?: string;
+  gender?: 'male' | 'female';
 }
 
 interface AuthContextType {
@@ -19,7 +22,8 @@ interface AuthContextType {
     email: string,
     password: string,
     fullName: string,
-    role: Profile['role']
+    role: Profile['role'],
+    phoneNumber?: string
   ) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
@@ -91,7 +95,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     email: string,
     password: string,
     fullName: string,
-    role: Profile['role']
+    role: Profile['role'],
+    phoneNumber?: string
   ) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -104,6 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error: profileError } = await supabase.from('profiles').insert({
         id: data.user.id,
         full_name: fullName,
+        phone_number: phoneNumber || null,
         role,
         language_preference: 'ar',
       });

@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import {
   Home,
   PlusCircle,
+  Bell,
   Settings,
 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -54,6 +55,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="notifications"
+        options={{
+          title: t.common.invitations,
+          tabBarIcon: ({ size, color }) => <Bell size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: t.common.settings,
@@ -74,6 +82,12 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="profile"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="cupping"
         options={{
           href: null,
         }}

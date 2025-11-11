@@ -18,6 +18,7 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [role, setRole] = useState<
     'doctor' | 'primary_caregiver' | 'backup_caregiver' | 'patient'
   >('primary_caregiver');
@@ -27,14 +28,14 @@ export default function RegisterScreen() {
   const router = useRouter();
 
   const handleRegister = async () => {
-    if (!email || !password || !fullName) {
+    if (!email || !password || !fullName || !phoneNumber) {
       Alert.alert(t.common.error, 'Please fill in all fields');
       return;
     }
 
     setLoading(true);
     try {
-      await signUp(email, password, fullName, role);
+      await signUp(email, password, fullName, role, phoneNumber);
       router.replace('/(tabs)');
     } catch (error: any) {
       Alert.alert(t.common.error, error.message);
@@ -77,6 +78,18 @@ export default function RegisterScreen() {
             value={fullName}
             onChangeText={setFullName}
             placeholder={t.auth.fullName}
+            textAlign={isRTL ? 'right' : 'left'}
+          />
+
+          <Text style={[styles.label, isRTL && styles.rtl]}>
+            {t.common.phoneNumber}
+          </Text>
+          <TextInput
+            style={[styles.input, isRTL && styles.rtlInput]}
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+            placeholder="+966501234567"
+            keyboardType="phone-pad"
             textAlign={isRTL ? 'right' : 'left'}
           />
 

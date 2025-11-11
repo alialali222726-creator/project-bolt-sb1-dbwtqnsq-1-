@@ -14,7 +14,6 @@ import {
   Pill,
   Users,
   UserPlus,
-  QrCode,
   Heart,
   AlertCircle,
   Stethoscope,
@@ -23,7 +22,6 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import QRScanner from '@/components/QRScanner';
 
 interface AddOption {
   id: string;
@@ -39,7 +37,6 @@ export default function AddScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { profile } = useAuth();
-  const [qrScannerVisible, setQrScannerVisible] = useState(false);
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('');
@@ -73,7 +70,7 @@ export default function AddScreen() {
       icon: Users,
       color: '#007AFF',
       bgColor: '#E3F2FD',
-      action: () => setQrScannerVisible(true),
+      action: () => openInviteModal('patient'),
     },
   ];
 
@@ -103,7 +100,7 @@ export default function AddScreen() {
       icon: Stethoscope,
       color: '#5856D6',
       bgColor: '#EDE7F6',
-      action: () => setQrScannerVisible(true),
+      action: () => openInviteModal('doctor'),
     },
     {
       id: 'chronic_condition',
@@ -142,7 +139,7 @@ export default function AddScreen() {
       icon: Stethoscope,
       color: '#5856D6',
       bgColor: '#EDE7F6',
-      action: () => setQrScannerVisible(true),
+      action: () => openInviteModal('cupper_to_doctor'),
     },
     {
       id: 'getting_cupped',
@@ -151,7 +148,7 @@ export default function AddScreen() {
       icon: Users,
       color: '#007AFF',
       bgColor: '#E3F2FD',
-      action: () => setQrScannerVisible(true),
+      action: () => openInviteModal('patient_getting_cupping'),
     },
   ];
 
@@ -176,42 +173,100 @@ export default function AddScreen() {
     setInviteModalVisible(true);
   };
 
+  const getRoleDescription = (role: string) => {
+    const descriptions: Record<string, { ar: string; en: string }> = {
+      primary_caregiver: {
+        ar: 'مرافق رئيسي - يمكنه إدارة الأدوية والمتابعة الكاملة',
+        en: 'Primary Caregiver - Can manage medications and full monitoring',
+      },
+      backup_caregiver: {
+        ar: 'مرافق احتياطي - يمكنه المساعدة في تسجيل الجرعات',
+        en: 'Backup Caregiver - Can help log doses',
+      },
+      doctor: {
+        ar: 'طبيب - يمكنه إضافة وتعديل الأدوية ومراقبة الالتزام',
+        en: 'Doctor - Can add/edit medications and monitor adherence',
+      },
+      patient: {
+        ar: 'مريض - الشخص الذي سيتم متابعة أدويته',
+        en: 'Patient - Person whose medications will be tracked',
+      },
+      cupper: {
+        ar: 'حجام - يمكنه مشاهدة الأمراض وإرسال طلبات إيقاف الأدوية',
+        en: 'Cupper - Can view conditions and send medication pause requests',
+      },
+      patient_getting_cupping: {
+        ar: 'متحجّم - شخص يريد الحجامة',
+        en: 'Getting Cupping - Person who wants cupping',
+      },
+      cupper_to_doctor: {
+        ar: 'ربط مع طبيب - للتنسيق حول إيقاف الأدوية',
+        en: 'Link with Doctor - To coordinate medication pauses',
+      },
+    };
+
+    return descriptions[role]?.[language === 'ar' ? 'ar' : 'en'] || '';
+  };
+
   const handleSendInvitation = async () => {
     if (!phoneNumber.trim()) {
-      Alert.alert(t.common.error, 'Please enter phone number');
+      Alert.alert(
+        t.common.error,
+        language === 'ar' ? 'الرجاء إدخال رقم الهاتف' : 'Please enter phone number'
+      );
       return;
     }
 
     try {
-      const { data: patientData } = await supabase
-        .from('patients')
-        .select('id')
-        .eq('created_by', profile?.id)
-        .maybeSingle();
+      let patientId = null;
 
-      if (!patientData) {
-        Alert.alert(t.common.error, 'Patient not found');
-        return;
+      if (selectedRole === 'patient' || selectedRole === 'patient_getting_cupping') {
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('id, role')
+          .eq('phone_number', phoneNumber)
+          .maybeSingle();
+
+        if (!existingProfile) {
+          Alert.alert(
+            t.common.error,
+            language === 'ar'
+              ? 'لم يتم العثور على مستخدم بهذا الرقم'
+              : 'No user found with this phone number'
+          );
+          return;
+        }
+
+        const { data: theirPatient } = await supabase
+          .from('patients')
+          .select('id')
+          .eq('created_by', existingProfile.id)
+          .maybeSingle();
+
+        if (theirPatient) {
+          patientId = theirPatient.id;
+        }
+      } else {
+        const { data: myPatient } = await supabase
+          .from('patients')
+          .select('id')
+          .eq('created_by', profile?.id)
+          .maybeSingle();
+
+        if (myPatient) {
+          patientId = myPatient.id;
+        }
       }
 
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
 
-      const roleDesc =
-        selectedRole === 'primary_caregiver'
-          ? language === 'ar'
-            ? 'مرافق رئيسي - يمكنه إدارة الأدوية والمتابعة الكاملة'
-            : 'Primary Caregiver - Can manage medications and full monitoring'
-          : language === 'ar'
-          ? 'مرافق احتياطي - يمكنه المساعدة في تسجيل الجرعات'
-          : 'Backup Caregiver - Can help log doses';
-
       const { error } = await supabase.from('invitations').insert({
         inviter_id: profile?.id,
-        patient_id: patientData.id,
+        patient_id: patientId,
         phone_number: phoneNumber,
-        role: selectedRole,
-        role_description: roleDesc,
+        role: selectedRole === 'cupper_to_doctor' ? 'cupper' : selectedRole,
+        role_description: getRoleDescription(selectedRole),
         status: 'pending',
         expires_at: expiresAt.toISOString(),
       });
@@ -221,8 +276,8 @@ export default function AddScreen() {
       Alert.alert(
         t.common.success,
         language === 'ar'
-          ? 'تم إرسال الدعوة بنجاح'
-          : 'Invitation sent successfully'
+          ? 'تم إرسال الدعوة بنجاح. سيتلقى المستخدم إشعاراً في التطبيق'
+          : 'Invitation sent successfully. User will receive an in-app notification'
       );
       setInviteModalVisible(false);
       setPhoneNumber('');
@@ -270,18 +325,6 @@ export default function AddScreen() {
         })}
       </ScrollView>
 
-      {qrScannerVisible && (
-        <Modal visible={true} animationType="slide">
-          <QRScanner
-            onClose={() => setQrScannerVisible(false)}
-            onSuccess={() => {
-              setQrScannerVisible(false);
-              router.push('/(tabs)/home');
-            }}
-          />
-        </Modal>
-      )}
-
       <Modal
         visible={inviteModalVisible}
         animationType="slide"
@@ -292,7 +335,7 @@ export default function AddScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, isRTL && styles.rtl]}>
-                {t.common.invite} {t.add.companion}
+                {language === 'ar' ? 'إضافة عبر رقم الهاتف' : 'Add via Phone Number'}
               </Text>
               <TouchableOpacity onPress={() => setInviteModalVisible(false)}>
                 <X size={24} color="#666666" />
@@ -312,13 +355,7 @@ export default function AddScreen() {
             />
 
             <Text style={[styles.roleDescription, isRTL && styles.rtl]}>
-              {selectedRole === 'primary_caregiver'
-                ? language === 'ar'
-                  ? 'المرافق الرئيسي يمكنه إدارة الأدوية والمتابعة الكاملة'
-                  : 'Primary caregiver can manage medications and full monitoring'
-                : language === 'ar'
-                ? 'المرافق الاحتياطي يمكنه المساعدة في تسجيل الجرعات'
-                : 'Backup caregiver can help log doses'}
+              {getRoleDescription(selectedRole)}
             </Text>
 
             <TouchableOpacity
@@ -407,7 +444,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
-    minHeight: 300,
+    minHeight: 350,
   },
   modalHeader: {
     flexDirection: 'row',
