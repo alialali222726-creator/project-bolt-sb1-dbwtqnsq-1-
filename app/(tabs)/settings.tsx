@@ -1,15 +1,44 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  TextInput,
+  Modal,
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { Globe, LogOut, User } from 'lucide-react-native';
+import { Globe, LogOut, User, Edit, Calendar } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { supabase } from '@/lib/supabase';
 
 export default function SettingsScreen() {
   const { profile, signOut } = useAuth();
   const { t, language, setLanguage } = useLanguage();
   const router = useRouter();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: profile?.full_name || '',
+    date_of_birth: profile?.date_of_birth || '',
+    gender: profile?.gender || '',
+  });
 
   const isRTL = language === 'ar';
+
+  const calculateAge = (birthDate: string) => {
+    if (!birthDate) return null;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   const handleLogout = async () => {
     Alert.alert(
@@ -42,40 +71,80 @@ export default function SettingsScreen() {
     setLanguage(language === 'ar' ? 'en' : 'ar');
   };
 
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case 'doctor':
-        return t.auth.doctor;
-      case 'primary_caregiver':
-        return t.auth.primaryCaregiver;
-      case 'backup_caregiver':
-        return t.auth.backupCaregiver;
-      default:
-        return role;
+  const handleUpdateProfile = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: formData.full_name,
+          date_of_birth: formData.date_of_birth || null,
+          gender: formData.gender || null,
+        })
+        .eq('id', profile?.id);
+
+      if (error) throw error;
+
+      Alert.alert(
+        t.common.success,
+        language === 'ar' ? 'تم تحديث الملف الشخصي' : 'Profile updated successfully',
+        [
+          {
+            text: t.common.confirm,
+            onPress: () => {
+              setModalVisible(false);
+              router.replace('/(tabs)/settings');
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(t.common.error, error.message);
     }
   };
+
+  const age = profile?.date_of_birth ? calculateAge(profile.date_of_birth) : null;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={[styles.title, isRTL && styles.rtl]}>
-          {language === 'ar' ? 'الإعدادات' : 'Settings'}
+          {t.common.settings}
         </Text>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView style={styles.content}>
         <View style={styles.profileSection}>
           <View style={styles.profileIcon}>
-            <User size={40} color="#007AFF" />
+            <User size={48} color="#007AFF" />
           </View>
           <View style={styles.profileInfo}>
             <Text style={[styles.profileName, isRTL && styles.rtl]}>
               {profile?.full_name}
             </Text>
-            <Text style={[styles.profileRole, isRTL && styles.rtl]}>
-              {getRoleLabel(profile?.role || '')}
-            </Text>
+            {age && (
+              <Text style={[styles.profileDetail, isRTL && styles.rtl]}>
+                {age} {t.common.years}
+              </Text>
+            )}
+            {profile?.gender && (
+              <Text style={[styles.profileDetail, isRTL && styles.rtl]}>
+                {profile.gender === 'male' ? t.common.male : t.common.female}
+              </Text>
+            )}
           </View>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => {
+              setFormData({
+                full_name: profile?.full_name || '',
+                date_of_birth: profile?.date_of_birth || '',
+                gender: profile?.gender || '',
+              });
+              setModalVisible(true);
+            }}
+          >
+            <Edit size={20} color="#007AFF" />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.settingsSection}>
@@ -116,18 +185,100 @@ export default function SettingsScreen() {
             </View>
           </TouchableOpacity>
         </View>
+      </ScrollView>
 
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, isRTL && styles.rtl]}>
-            {language === 'ar'
-              ? 'تطبيق إدارة العلاج الدوائي'
-              : 'Medication Management App'}
-          </Text>
-          <Text style={[styles.footerVersion, isRTL && styles.rtl]}>
-            Version 1.0.0
-          </Text>
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, isRTL && styles.rtl]}>
+                {language === 'ar' ? 'تعديل الملف الشخصي' : 'Edit Profile'}
+              </Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Text style={styles.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView>
+              <Text style={[styles.label, isRTL && styles.rtl]}>
+                {language === 'ar' ? 'الاسم الكامل' : 'Full Name'}
+              </Text>
+              <TextInput
+                style={[styles.input, isRTL && styles.rtlInput]}
+                value={formData.full_name}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, full_name: text })
+                }
+                placeholder={language === 'ar' ? 'الاسم الكامل' : 'Full Name'}
+                textAlign={isRTL ? 'right' : 'left'}
+              />
+
+              <Text style={[styles.label, isRTL && styles.rtl]}>
+                {t.common.dateOfBirth}
+              </Text>
+              <TextInput
+                style={[styles.input, isRTL && styles.rtlInput]}
+                value={formData.date_of_birth}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, date_of_birth: text })
+                }
+                placeholder="YYYY-MM-DD"
+                textAlign={isRTL ? 'right' : 'left'}
+              />
+
+              <Text style={[styles.label, isRTL && styles.rtl]}>
+                {t.common.gender}
+              </Text>
+              <View style={styles.genderButtons}>
+                <TouchableOpacity
+                  style={[
+                    styles.genderButton,
+                    formData.gender === 'male' && styles.genderButtonActive,
+                  ]}
+                  onPress={() => setFormData({ ...formData, gender: 'male' })}
+                >
+                  <Text
+                    style={[
+                      styles.genderButtonText,
+                      formData.gender === 'male' && styles.genderButtonTextActive,
+                    ]}
+                  >
+                    {t.common.male}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.genderButton,
+                    formData.gender === 'female' && styles.genderButtonActive,
+                  ]}
+                  onPress={() => setFormData({ ...formData, gender: 'female' })}
+                >
+                  <Text
+                    style={[
+                      styles.genderButtonText,
+                      formData.gender === 'female' && styles.genderButtonTextActive,
+                    ]}
+                  >
+                    {t.common.female}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleUpdateProfile}
+              >
+                <Text style={styles.submitButtonText}>{t.patients.save}</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
         </View>
-      </View>
+      </Modal>
     </View>
   );
 }
@@ -159,16 +310,16 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   profileIcon: {
     width: 80,
@@ -183,14 +334,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileName: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     color: '#1A1A1A',
     marginBottom: 4,
   },
-  profileRole: {
-    fontSize: 16,
+  profileDetail: {
+    fontSize: 14,
     color: '#666666',
+    marginBottom: 2,
+  },
+  editButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#F5F5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   settingsSection: {
     marginBottom: 24,
@@ -208,9 +368,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   settingLeft: {
     flexDirection: 'row',
@@ -241,19 +401,88 @@ const styles = StyleSheet.create({
   logoutText: {
     color: '#FF3B30',
   },
-  footer: {
+  modalOverlay: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 20,
+    marginBottom: 24,
   },
-  footerText: {
-    fontSize: 14,
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1A1A1A',
+  },
+  modalClose: {
+    fontSize: 24,
     color: '#666666',
-    marginBottom: 4,
   },
-  footerVersion: {
-    fontSize: 12,
-    color: '#999999',
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1A1A1A',
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+  },
+  rtlInput: {
+    textAlign: 'right',
+  },
+  genderButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 24,
+  },
+  genderButton: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E5E5',
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+  },
+  genderButtonActive: {
+    borderColor: '#007AFF',
+    backgroundColor: '#E3F2FD',
+  },
+  genderButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666666',
+  },
+  genderButtonTextActive: {
+    color: '#007AFF',
+  },
+  submitButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  submitButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

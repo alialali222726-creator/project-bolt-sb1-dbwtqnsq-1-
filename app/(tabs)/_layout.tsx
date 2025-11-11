@@ -1,8 +1,7 @@
 import { Tabs } from 'expo-router';
 import {
-  Users,
-  Pill,
-  Activity,
+  Home,
+  PlusCircle,
   Settings,
 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,46 +20,62 @@ export default function TabLayout() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E5E5E5',
-          height: 60,
-          paddingBottom: 8,
+          height: 68,
+          paddingBottom: 12,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
         },
+        tabBarIconStyle: {
+          marginTop: 4,
+        },
       }}
     >
       <Tabs.Screen
+        name="home"
+        options={{
+          title: t.common.home,
+          tabBarIcon: ({ size, color }) => <Home size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
-          title: t.patients.title,
-          tabBarIcon: ({ size, color }) => <Users size={size} color={color} />,
+          href: null,
         }}
       />
       <Tabs.Screen
-        name="medications"
+        name="add"
         options={{
-          title: t.medications.title,
-          tabBarIcon: ({ size, color }) => <Pill size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="adherence"
-        options={{
-          title: t.adherence.title,
-          tabBarIcon: ({ size, color }) => (
-            <Activity size={size} color={color} />
-          ),
+          title: t.common.add,
+          tabBarIcon: ({ size, color }) => <PlusCircle size={32} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: t.common.filter,
-          tabBarIcon: ({ size, color }) => (
-            <Settings size={size} color={color} />
-          ),
+          title: t.common.settings,
+          tabBarIcon: ({ size, color }) => <Settings size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="medications"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="adherence"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
