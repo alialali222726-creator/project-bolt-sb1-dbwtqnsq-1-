@@ -101,8 +101,11 @@ export default function SettingsScreen() {
           onPress: async () => {
             try {
               await signOut();
-              router.replace('/(auth)/login');
+              setTimeout(() => {
+                router.replace('/(auth)/login');
+              }, 100);
             } catch (error: any) {
+              console.error('Logout error:', error);
               Alert.alert(t.common.error, error.message);
             }
           },

@@ -22,6 +22,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import PhoneInput, { COUNTRIES } from '@/components/PhoneInput';
 
 interface AddOption {
   id: string;
@@ -39,6 +40,8 @@ export default function AddScreen() {
   const { profile } = useAuth();
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [countryCode, setCountryCode] = useState(profile?.country_code || 'SA');
+  const [phoneCountryCode, setPhoneCountryCode] = useState(profile?.phone_country_code || '+966');
   const [selectedRole, setSelectedRole] = useState<string>('');
 
   const isRTL = language === 'ar';
@@ -219,12 +222,13 @@ export default function AddScreen() {
 
     try {
       let patientId = null;
+      const fullPhoneNumber = phoneCountryCode + phoneNumber;
 
       if (selectedRole === 'patient' || selectedRole === 'patient_getting_cupping') {
         const { data: existingProfile } = await supabase
           .from('profiles')
           .select('id, role')
-          .eq('phone_number', phoneNumber)
+          .eq('phone_number', fullPhoneNumber)
           .maybeSingle();
 
         if (!existingProfile) {
@@ -264,7 +268,7 @@ export default function AddScreen() {
       const { error } = await supabase.from('invitations').insert({
         inviter_id: profile?.id,
         patient_id: patientId,
-        phone_number: phoneNumber,
+        phone_number: fullPhoneNumber,
         role: selectedRole === 'cupper_to_doctor' ? 'cupper' : selectedRole,
         role_description: getRoleDescription(selectedRole),
         status: 'pending',
@@ -342,16 +346,19 @@ export default function AddScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={[styles.label, isRTL && styles.rtl]}>
-              {t.common.phoneNumber}
-            </Text>
-            <TextInput
-              style={[styles.input, isRTL && styles.rtlInput]}
+            <PhoneInput
               value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              placeholder="+966501234567"
-              keyboardType="phone-pad"
-              textAlign={isRTL ? 'right' : 'left'}
+              countryCode={countryCode}
+              phoneCountryCode={phoneCountryCode}
+              onChangePhone={setPhoneNumber}
+              onChangeCountry={(country) => {
+                setCountryCode(country.code);
+                setPhoneCountryCode(country.phone_code);
+              }}
+              language={language}
+              isRTL={isRTL}
+              label={t.common.phoneNumber}
+              showCountrySelector={true}
             />
 
             <Text style={[styles.roleDescription, isRTL && styles.rtl]}>
