@@ -6,6 +6,9 @@ interface Profile {
   id: string;
   full_name: string;
   phone_number?: string;
+  avatar_url?: string;
+  country_code?: string;
+  phone_country_code?: string;
   role: 'doctor' | 'primary_caregiver' | 'backup_caregiver' | 'patient' | 'cupper' | 'patient_getting_cupping';
   language_preference: 'ar' | 'en';
   date_of_birth?: string;
