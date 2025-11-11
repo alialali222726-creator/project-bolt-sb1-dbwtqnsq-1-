@@ -1,15 +1,21 @@
 import { Tabs } from 'expo-router';
+import { Platform } from 'react-native';
 import {
   Home,
-  PlusCircle,
   Bell,
   Settings,
 } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { responsive } from '@/lib/responsive';
 
 export default function TabLayout() {
   const { t, language } = useLanguage();
+  const insets = useSafeAreaInsets();
   const isRTL = language === 'ar';
+
+  const tabBarHeight = responsive.tabBarHeight + (Platform.OS === 'ios' ? insets.bottom : 8);
+  const iconSize = responsive.iconSize(24);
 
   return (
     <Tabs
@@ -21,16 +27,16 @@ export default function TabLayout() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E5E5E5',
-          height: 68,
-          paddingBottom: 12,
-          paddingTop: 8,
+          height: tabBarHeight,
+          paddingBottom: Platform.OS === 'ios' ? insets.bottom : 8,
+          paddingTop: responsive.isSmallScreen ? 4 : 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: responsive.fontSize(12),
           fontWeight: '600',
         },
         tabBarIconStyle: {
-          marginTop: 4,
+          marginTop: responsive.isSmallScreen ? 2 : 4,
         },
       }}
     >
@@ -38,7 +44,7 @@ export default function TabLayout() {
         name="home"
         options={{
           title: t.common.home,
-          tabBarIcon: ({ size, color }) => <Home size={28} color={color} />,
+          tabBarIcon: ({ size, color }) => <Home size={iconSize} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -50,22 +56,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="add"
         options={{
-          title: t.common.add,
-          tabBarIcon: ({ size, color }) => <PlusCircle size={32} color={color} />,
+          href: null,
         }}
       />
       <Tabs.Screen
         name="notifications"
         options={{
           title: t.common.invitations,
-          tabBarIcon: ({ size, color }) => <Bell size={28} color={color} />,
+          tabBarIcon: ({ size, color }) => <Bell size={iconSize} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: t.common.settings,
-          tabBarIcon: ({ size, color }) => <Settings size={28} color={color} />,
+          tabBarIcon: ({ size, color }) => <Settings size={iconSize} color={color} />,
         }}
       />
       <Tabs.Screen

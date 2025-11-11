@@ -13,10 +13,14 @@ import {
   AlertCircle,
   Stethoscope,
   Pill,
+  Plus,
 } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
+import { responsive } from '@/lib/responsive';
 
 interface ChronicCondition {
   id: string;
@@ -40,6 +44,8 @@ interface Doctor {
 export default function HomeScreen() {
   const { profile } = useAuth();
   const { t, language } = useLanguage();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [conditions, setConditions] = useState<ChronicCondition[]>([]);
   const [allergies, setAllergies] = useState<MedicationAllergy[]>([]);
@@ -157,7 +163,8 @@ export default function HomeScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={{ paddingTop: insets.top }}>
       <View style={styles.profileHeader}>
         <View style={styles.profileImageContainer}>
           <User size={56} color="#007AFF" />
@@ -313,8 +320,24 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <View style={{ height: 40 }} />
-    </ScrollView>
+        <View style={{ height: 40 }} />
+      </ScrollView>
+
+      <TouchableOpacity
+        style={[
+          styles.fab,
+          {
+            bottom: responsive.tabBarHeight + 16,
+            right: isRTL ? undefined : responsive.padding,
+            left: isRTL ? responsive.padding : undefined,
+          },
+        ]}
+        onPress={() => router.push('/(tabs)/add')}
+        activeOpacity={0.8}
+      >
+        <Plus size={28} color="#FFFFFF" strokeWidth={2.5} />
+      </TouchableOpacity>
+    </View>
   );
 }
 
@@ -322,6 +345,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
+  },
+  scrollView: {
+    flex: 1,
   },
   centerContainer: {
     flex: 1,
@@ -331,8 +357,8 @@ const styles = StyleSheet.create({
   },
   profileHeader: {
     backgroundColor: '#FFFFFF',
-    paddingTop: 60,
-    paddingBottom: 32,
+    paddingTop: responsive.padding,
+    paddingBottom: responsive.moderateScale(32),
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
@@ -360,8 +386,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   section: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingHorizontal: responsive.padding,
+    paddingVertical: responsive.padding,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -471,5 +497,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666666',
     marginTop: 4,
+  },
+  fab: {
+    position: 'absolute',
+    width: responsive.moderateScale(60),
+    height: responsive.moderateScale(60),
+    borderRadius: responsive.moderateScale(30),
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 8,
   },
 });
