@@ -156,9 +156,9 @@ export default function PatientsScreen() {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.patientCard}
-              onPress={() =>
-                router.push(`/patient/${item.id}` as `http${string}`)
-              }
+              onPress={() => {
+                // Navigate to patient detail (implement later)
+              }}
             >
               <View style={styles.patientIcon}>
                 <User size={32} color="#007AFF" />
