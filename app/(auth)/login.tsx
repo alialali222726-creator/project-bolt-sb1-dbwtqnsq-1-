@@ -114,7 +114,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F4ECFF',
   },
   scrollContent: {
     flexGrow: 1,
@@ -148,17 +148,17 @@ const styles = StyleSheet.create({
   langText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#007AFF',
+    color: '#8B5CF6',
   },
   form: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    borderRadius: 24,
+    padding: 32,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 8,
   },
   label: {
     fontSize: 16,
@@ -167,28 +167,28 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#F9F5FF',
+    borderRadius: 16,
+    padding: 18,
     fontSize: 16,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: '#E9D5FF',
   },
   rtlInput: {
     textAlign: 'right',
   },
   button: {
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#8B5CF6',
+    borderRadius: 16,
+    padding: 18,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowRadius: 12,
+    elevation: 6,
   },
   buttonDisabled: {
     backgroundColor: '#CCCCCC',
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   linkText: {
-    color: '#007AFF',
+    color: '#8B5CF6',
     fontSize: 16,
   },
 });

@@ -282,7 +282,7 @@ export default function SettingsScreen() {
           >
             <View style={[styles.settingLeft, isRTL && styles.settingLeftRTL]}>
               <View style={styles.iconContainer}>
-                <Edit size={20} color="#007AFF" />
+                <Edit size={20} color="#8B5CF6" />
               </View>
               <Text style={[styles.settingText, isRTL && styles.rtl]}>
                 {language === 'ar' ? 'تعديل الملف الشخصي' : 'Edit Profile'}
@@ -293,7 +293,7 @@ export default function SettingsScreen() {
           <TouchableOpacity style={styles.settingItem} onPress={toggleLanguage}>
             <View style={[styles.settingLeft, isRTL && styles.settingLeftRTL]}>
               <View style={styles.iconContainer}>
-                <Globe size={20} color="#007AFF" />
+                <Globe size={20} color="#8B5CF6" />
               </View>
               <Text style={[styles.settingText, isRTL && styles.rtl]}>
                 {language === 'ar' ? 'اللغة' : 'Language'}
@@ -483,15 +483,14 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F4ECFF',
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'transparent',
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
+    borderBottomWidth: 0,
   },
   title: {
     fontSize: 28,
@@ -509,6 +508,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 32,
     marginBottom: 16,
+    marginHorizontal: 16,
+    borderRadius: 24,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 5,
   },
   avatarContainer: {
     position: 'relative',
@@ -524,7 +530,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#8B5CF6',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -535,7 +541,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#8B5CF6',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
@@ -554,7 +560,14 @@ const styles = StyleSheet.create({
   section: {
     backgroundColor: '#FFFFFF',
     marginBottom: 16,
+    marginHorizontal: 16,
     paddingVertical: 8,
+    borderRadius: 24,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 5,
   },
   settingItem: {
     flexDirection: 'row',
@@ -573,10 +586,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#E3F2FD',
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#EDE9FE',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -610,10 +623,14 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     padding: 24,
     maxHeight: '85%',
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
   },
   modalTitle: {
     fontSize: 20,
@@ -697,8 +714,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   genderButtonActive: {
-    borderColor: '#007AFF',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#8B5CF6',
+    backgroundColor: '#EDE9FE',
   },
   genderText: {
     fontSize: 16,
@@ -706,7 +723,7 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   genderTextActive: {
-    color: '#007AFF',
+    color: '#8B5CF6',
   },
   modalButtons: {
     flexDirection: 'row',
@@ -729,7 +746,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#8B5CF6',
     alignItems: 'center',
   },
   saveButtonText: {

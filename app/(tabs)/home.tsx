@@ -167,7 +167,7 @@ export default function HomeScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={{ paddingTop: insets.top }}>
       <View style={styles.profileHeader}>
         <View style={styles.profileImageContainer}>
-          <User size={56} color="#007AFF" />
+          <User size={56} color="#8B5CF6" />
         </View>
         <Text style={[styles.profileName, isRTL && styles.rtl]}>
           {profile?.full_name}
@@ -176,7 +176,7 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Heart size={20} color="#FF3B30" />
+          <Heart size={20} color="#EF4444" />
           <Text style={[styles.sectionTitle, isRTL && styles.rtl]}>
             {t.profile.chronicConditions}
           </Text>
@@ -200,8 +200,8 @@ export default function HomeScreen() {
           >
             {conditions.map((condition) => (
               <View key={condition.id} style={styles.horizontalCard}>
-                <View style={[styles.cardIcon, { backgroundColor: '#FFEBEE' }]}>
-                  <Heart size={24} color="#FF3B30" />
+                <View style={[styles.cardIcon, { backgroundColor: '#FEE2E2' }]}>
+                  <Heart size={24} color="#EF4444" />
                 </View>
                 <Text
                   style={[styles.cardText, isRTL && styles.rtl]}
@@ -217,7 +217,7 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Stethoscope size={20} color="#34C759" />
+          <Stethoscope size={20} color="#22C55E" />
           <Text style={[styles.sectionTitle, isRTL && styles.rtl]}>
             {t.profile.myDoctor}
           </Text>
@@ -231,8 +231,8 @@ export default function HomeScreen() {
           </View>
         ) : (
           <View style={styles.doctorCard}>
-            <View style={[styles.cardIcon, { backgroundColor: '#E8F5E9' }]}>
-              <Stethoscope size={32} color="#34C759" />
+            <View style={[styles.cardIcon, { backgroundColor: '#DCFCE7' }]}>
+              <Stethoscope size={32} color="#22C55E" />
             </View>
             <View style={styles.doctorInfo}>
               <Text style={[styles.doctorName, isRTL && styles.rtl]}>
@@ -252,7 +252,7 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <AlertCircle size={20} color="#FF9500" />
+          <AlertCircle size={20} color="#F59E0B" />
           <Text style={[styles.sectionTitle, isRTL && styles.rtl]}>
             {t.profile.allergies}
           </Text>
@@ -301,15 +301,15 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Pill size={20} color="#007AFF" />
+          <Pill size={20} color="#8B5CF6" />
           <Text style={[styles.sectionTitle, isRTL && styles.rtl]}>
             {t.profile.myMedications}
           </Text>
         </View>
 
         <View style={styles.medicationCard}>
-          <View style={[styles.cardIcon, { backgroundColor: '#E3F2FD', width: 72, height: 72 }]}>
-            <Pill size={40} color="#007AFF" />
+          <View style={[styles.cardIcon, { backgroundColor: '#EDE9FE', width: 72, height: 72 }]}>
+            <Pill size={40} color="#8B5CF6" />
           </View>
           <View style={styles.medicationInfo}>
             <Text style={styles.medicationNumber}>{medicationCount}</Text>
@@ -344,7 +344,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F4ECFF',
   },
   scrollView: {
     flex: 1,
@@ -353,29 +353,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F4ECFF',
   },
   profileHeader: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'transparent',
     paddingTop: responsive.padding,
     paddingBottom: responsive.moderateScale(32),
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
+    borderBottomWidth: 0,
   },
   profileImageContainer: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
   },
   profileName: {
     fontSize: 24,
@@ -402,9 +401,14 @@ const styles = StyleSheet.create({
   },
   emptyCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
     alignItems: 'center',
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
   emptyText: {
     fontSize: 14,
@@ -423,14 +427,14 @@ const styles = StyleSheet.create({
   },
   horizontalCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 20,
+    padding: 20,
     width: 160,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 5,
   },
   cardIcon: {
     width: 48,
@@ -448,15 +452,15 @@ const styles = StyleSheet.create({
   },
   doctorCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 5,
   },
   doctorInfo: {
     flex: 1,
@@ -474,16 +478,16 @@ const styles = StyleSheet.create({
   },
   medicationCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 24,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 5,
   },
   medicationInfo: {
     alignItems: 'center',
@@ -491,7 +495,7 @@ const styles = StyleSheet.create({
   medicationNumber: {
     fontSize: 48,
     fontWeight: '700',
-    color: '#007AFF',
+    color: '#8B5CF6',
   },
   medicationLabel: {
     fontSize: 14,
@@ -500,16 +504,16 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    width: responsive.moderateScale(60),
-    height: responsive.moderateScale(60),
-    borderRadius: responsive.moderateScale(30),
-    backgroundColor: '#007AFF',
+    width: responsive.moderateScale(64),
+    height: responsive.moderateScale(64),
+    borderRadius: responsive.moderateScale(32),
+    backgroundColor: '#8B5CF6',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 10,
   },
 });
