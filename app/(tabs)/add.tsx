@@ -19,10 +19,12 @@ import {
   Stethoscope,
   X,
 } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import PhoneInput, { COUNTRIES } from '@/components/PhoneInput';
+import { responsive } from '@/lib/responsive';
 
 interface AddOption {
   id: string;
@@ -36,6 +38,7 @@ interface AddOption {
 
 export default function AddScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { t, language } = useLanguage();
   const { profile } = useAuth();
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
@@ -294,13 +297,13 @@ export default function AddScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + responsive.padding }]}>
         <Text style={[styles.title, isRTL && styles.rtl]}>{t.add.title}</Text>
       </View>
 
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: responsive.tabBarHeight + 20 }]}
       >
         {options.map((option) => {
           const Icon = option.icon;
@@ -336,7 +339,7 @@ export default function AddScreen() {
         onRequestClose={() => setInviteModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { maxHeight: responsive.modalMaxHeight }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, isRTL && styles.rtl]}>
                 {language === 'ar' ? 'إضافة عبر رقم الهاتف' : 'Add via Phone Number'}
@@ -385,8 +388,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#FFFFFF',
-    paddingTop: 60,
-    paddingHorizontal: 20,
+    paddingHorizontal: responsive.padding,
     paddingBottom: 24,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
@@ -403,15 +405,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
-    gap: 16,
+    padding: responsive.padding,
+    gap: responsive.isSmallScreen ? 12 : 16,
   },
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: responsive.isSmallScreen ? 12 : 16,
+    padding: responsive.cardPadding,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
