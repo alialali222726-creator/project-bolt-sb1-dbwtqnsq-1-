@@ -200,12 +200,12 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   input: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#F9F5FF',
+    borderRadius: 16,
+    padding: 18,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: '#E9D5FF',
   },
   rtlInput: {
     textAlign: 'right',
@@ -223,14 +223,14 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     alignItems: 'center',
   },
   cancelButton: {
     backgroundColor: '#F5F5F5',
   },
   submitButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#8B5CF6',
   },
   buttonDisabled: {
     backgroundColor: '#CCCCCC',

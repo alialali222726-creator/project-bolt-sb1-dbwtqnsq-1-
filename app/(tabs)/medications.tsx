@@ -267,9 +267,48 @@ export default function MedicationsScreen() {
         if (error) throw error;
         Alert.alert(t.common.success, 'Medication updated successfully');
       } else {
+        // Get patient_id for the current user
+        let patientId = medications[0]?.patient_id;
+
+        if (!patientId) {
+          // If no medications exist, find or create patient
+          const { data: existingPatient } = await supabase
+            .from('patients')
+            .select('id')
+            .eq('created_by', profile?.id)
+            .maybeSingle();
+
+          if (existingPatient) {
+            patientId = existingPatient.id;
+          } else {
+            // Create new patient
+            const { data: newPatient, error: patientError } = await supabase
+              .from('patients')
+              .insert({
+                name: profile?.full_name || 'Patient',
+                created_by: profile?.id,
+              })
+              .select()
+              .single();
+
+            if (patientError) throw patientError;
+            patientId = newPatient.id;
+
+            // Add user to their own patient team
+            await supabase
+              .from('patient_team')
+              .insert({
+                patient_id: patientId,
+                user_id: profile?.id,
+                role: profile?.role || 'patient',
+                assigned_by: profile?.id,
+              });
+          }
+        }
+
         const { error } = await supabase.from('medications').insert({
           ...formData,
-          patient_id: medications[0]?.patient_id,
+          patient_id: patientId,
           prescribed_by: profile?.id,
         });
 
@@ -331,7 +370,7 @@ export default function MedicationsScreen() {
               <View style={styles.medicationCard}>
                 <View style={styles.medicationHeader}>
                   <View style={styles.medicationIcon}>
-                    <Pill size={24} color="#007AFF" />
+                    <Pill size={24} color="#8B5CF6" />
                   </View>
                   <View style={styles.medicationInfo}>
                     <Text style={[styles.medicationName, isRTL && styles.rtl]}>
@@ -431,7 +470,7 @@ export default function MedicationsScreen() {
                           style={styles.editButton}
                           onPress={() => handleEditMedication(item)}
                         >
-                          <Edit size={18} color="#007AFF" />
+                          <Edit size={18} color="#8B5CF6" />
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={styles.deleteButton}
@@ -537,7 +576,7 @@ export default function MedicationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F4ECFF',
   },
   centerContainer: {
     flex: 1,
@@ -545,12 +584,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'transparent',
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
+    borderBottomWidth: 0,
   },
   title: {
     fontSize: 28,
@@ -576,14 +614,14 @@ const styles = StyleSheet.create({
   },
   medicationCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 5,
   },
   medicationHeader: {
     flexDirection: 'row',
@@ -594,7 +632,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#EDE9FE',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -666,7 +704,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#CCCCCC',
   },
   confirmButtonLoading: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#8B5CF6',
   },
   confirmButtonText: {
     color: '#FFFFFF',
@@ -686,11 +724,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E3F2FD',
-    borderRadius: 8,
+    backgroundColor: '#EDE9FE',
+    borderRadius: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#007AFF',
+    borderColor: '#8B5CF6',
   },
   deleteButton: {
     flex: 1,
@@ -707,15 +745,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#007AFF',
+    backgroundColor: '#8B5CF6',
     margin: 20,
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 4 },
+    padding: 18,
+    borderRadius: 16,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowRadius: 12,
+    elevation: 6,
   },
   addButtonText: {
     color: '#FFFFFF',
@@ -725,7 +763,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F4ECFF',
     paddingTop: 60,
   },
   modalHeader: {
@@ -739,7 +777,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E5E5E5',
   },
   modalCloseText: {
-    color: '#007AFF',
+    color: '#8B5CF6',
     fontSize: 16,
     fontWeight: '600',
   },
