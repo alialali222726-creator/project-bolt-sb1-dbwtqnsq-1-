@@ -21,7 +21,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#007AFF',
+        tabBarActiveTintColor: '#8B5CF6',
         tabBarInactiveTintColor: '#8E8E93',
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
@@ -81,12 +81,6 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="adherence"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
         options={{
           href: null,
         }}
